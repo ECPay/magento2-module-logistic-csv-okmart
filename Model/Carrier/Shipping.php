@@ -61,6 +61,7 @@ class Shipping extends AbstractCarrier implements CarrierInterface
 
     /**
      * get allowed methods
+     *
      * @return array
      */
     public function getAllowedMethods()
@@ -81,7 +82,7 @@ class Shipping extends AbstractCarrier implements CarrierInterface
     }
 
     /**
-     * @param RateRequest $request
+     * @param  RateRequest $request
      * @return bool|Result
      * 控制物流是否要顯示在列表
      * 訂單金額等相關門檻在此判斷
@@ -93,23 +94,31 @@ class Shipping extends AbstractCarrier implements CarrierInterface
         }
 
         // 判斷綠界物流是否啟用
-        $ecpayEnableLogistic = $this->_mainService->getMainConfig('ecpay_enabled_logistic') ;
-        $this->_loggerInterface->debug('LogisticCsvOkmart collectRates ecpayEnableLogistic:'. print_r($ecpayEnableLogistic,true));
+        $ecpayEnableLogistic = $this->_mainService->getMainConfig('ecpay_enabled_logistic');
+        $this->_loggerInterface->debug('LogisticCsvOkmart collectRates ecpayEnableLogistic:'. print_r($ecpayEnableLogistic, true));
         if ($ecpayEnableLogistic != 1) {
             return false ;
         }
 
         // 取出CvsType
-        $logisticCvsType = $this->_mainService->getLogisticConfig('logistic_cvs_type') ;
-        $this->_loggerInterface->debug('LogisticCsvOkmart collectRates logisticCvsType:'. print_r($logisticCvsType,true));
+        $logisticCvsType = $this->_mainService->getLogisticConfig('logistic_cvs_type');
+        $this->_loggerInterface->debug('LogisticCsvOkmart collectRates logisticCvsType:'. print_r($logisticCvsType, true));
         if ($logisticCvsType == 'B2C') {
             return false ;
         }
 
-        /** @var \Magento\Shipping\Model\Rate\Result $result */
+        /**
+* 
+         *
+ * @var \Magento\Shipping\Model\Rate\Result $result 
+*/
         $result = $this->_rateResultFactory->create();
 
-        /** @var \Magento\Quote\Model\Quote\Address\RateResult\Method $method */
+        /**
+* 
+         *
+ * @var \Magento\Quote\Model\Quote\Address\RateResult\Method $method 
+*/
         $method = $this->_rateMethodFactory->create();
 
         $method->setCarrier($this->_code);
@@ -120,32 +129,32 @@ class Shipping extends AbstractCarrier implements CarrierInterface
 
         // 物流費
         $amount = $this->getShippingPrice();
-        $this->_loggerInterface->debug('LogisticCsvOkmart collectRates amount:'. print_r($amount,true));
+        $this->_loggerInterface->debug('LogisticCsvOkmart collectRates amount:'. print_r($amount, true));
 
         // 購物車金額
         $total = $request->getBaseSubtotalInclTax();
-        $this->_loggerInterface->debug('LogisticCsvOkmart collectRates total:'. print_r($total,true));
+        $this->_loggerInterface->debug('LogisticCsvOkmart collectRates total:'. print_r($total, true));
 
         // 訂單最小金額
-        $minOrderAmount = $this->getConfigData('min_order_amount') ;
-        $this->_loggerInterface->debug('LogisticCsvOkmart collectRates min_order_amount:'. print_r($minOrderAmount,true));
+        $minOrderAmount = $this->getConfigData('min_order_amount');
+        $this->_loggerInterface->debug('LogisticCsvOkmart collectRates min_order_amount:'. print_r($minOrderAmount, true));
 
         // 訂單最大金額
-        $maxOrderAmount = $this->getConfigData('max_order_amount') ;
-        $maxOrderAmount = $this->_logisticService->getCvsAvailableMaxAmount($maxOrderAmount) ;
-        $this->_loggerInterface->debug('LogisticCsvOkmart collectRates max_order_amount:'. print_r($maxOrderAmount,true));
+        $maxOrderAmount = $this->getConfigData('max_order_amount');
+        $maxOrderAmount = $this->_logisticService->getCvsAvailableMaxAmount($maxOrderAmount);
+        $this->_loggerInterface->debug('LogisticCsvOkmart collectRates max_order_amount:'. print_r($maxOrderAmount, true));
 
         // 免運門檻開關
-        $freeShippingEnable = $this->getConfigData('free_shipping_enable') ;
-        $this->_loggerInterface->debug('LogisticCsvOkmart collectRates free_shipping_enable:'. print_r($freeShippingEnable,true));
+        $freeShippingEnable = $this->getConfigData('free_shipping_enable');
+        $this->_loggerInterface->debug('LogisticCsvOkmart collectRates free_shipping_enable:'. print_r($freeShippingEnable, true));
 
         // 免運門檻金額
-        $freeShippingSubtotal = $this->getConfigData('free_shipping_subtotal') ;
-        $this->_loggerInterface->debug('LogisticCsvOkmart collectRates free_shipping_subtotal:'. print_r($freeShippingSubtotal,true));
+        $freeShippingSubtotal = $this->getConfigData('free_shipping_subtotal');
+        $this->_loggerInterface->debug('LogisticCsvOkmart collectRates free_shipping_subtotal:'. print_r($freeShippingSubtotal, true));
 
         // 購物車重量
         $shippingWeight = $request->getPackageWeight();
-        $this->_loggerInterface->debug('LogisticCsvOkmart collectRates shippingWeight:'. print_r($shippingWeight,true));
+        $this->_loggerInterface->debug('LogisticCsvOkmart collectRates shippingWeight:'. print_r($shippingWeight, true));
 
         // 判斷訂單最高金額
         if ($total > $maxOrderAmount) {
